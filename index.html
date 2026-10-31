@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Alt vi skal bli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg1:#2b1a24; --bg2:#7a3b3f; --glow:#f3b27a; --ink:#fff7f0; --soft:rgba(255,247,240,.72); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; }
+  body {
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px;
+    font-family:Inter, system-ui, sans-serif; color:var(--ink);
+    background: radial-gradient(120% 80% at 50% 100%, var(--glow) 0%, var(--bg2) 38%, var(--bg1) 100%);
+    overflow:hidden;
+  }
+  .card { width:100%; max-width:420px; text-align:center; position:relative; z-index:1; }
+  .eyebrow { font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--soft); }
+  h1 { font-family:"Cormorant Garamond", Georgia, serif; font-weight:500; font-size:clamp(40px, 12vw, 56px); line-height:1.05; margin:14px 0 6px; }
+  .sub { font-family:"Cormorant Garamond", Georgia, serif; font-style:italic; font-size:20px; color:var(--soft); }
+  .play {
+    margin:40px auto 22px; width:108px; height:108px; border-radius:50%; border:0; cursor:pointer;
+    background:var(--ink); color:var(--bg2); display:grid; place-items:center;
+    box-shadow:0 0 0 10px rgba(255,247,240,.12), 0 0 60px rgba(243,178,122,.55);
+    transition:transform .2s ease;
+  }
+  .play:active { transform:scale(.96); }
+  .play svg { width:40px; height:40px; }
+  .bar { height:4px; border-radius:2px; background:rgba(255,247,240,.2); overflow:hidden; margin:0 8px; }
+  .bar i { display:block; height:100%; width:0; background:var(--ink); }
+  .time { display:flex; justify-content:space-between; font-size:12px; color:var(--soft); margin:8px 8px 0; font-variant-numeric:tabular-nums; }
+  .heart { position:fixed; bottom:-20px; color:rgba(255,247,240,.35); font-size:16px; animation:rise linear infinite; pointer-events:none; }
+  @keyframes rise { to { transform:translateY(-110vh) rotate(20deg); opacity:0; } }
+  @media (prefers-reduced-motion: reduce) { .heart { display:none; } }
+</style>
+</head>
+<body>
+  <main class="card">
+    <p class="eyebrow">Ett år med deg</p>
+    <h1>Alt vi skal bli</h1>
+    <p class="sub">en sang til deg ♡</p>
+    <button class="play" id="play" aria-label="Spill av">
+      <svg id="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+    </button>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="time"><span id="cur">0:00</span><span id="dur">0:00</span></div>
+    <audio id="a" src="sang.mp3" preload="metadata"></audio>
+  </main>
+<script>
+  const a = document.getElementById('a'), btn = document.getElementById('play'), icon = document.getElementById('icon');
+  const PLAY = '<path d="M8 5.5v13l11-6.5z"/>', PAUSE = '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';
+  const fmt = s => isFinite(s) ? Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0') : '0:00';
+  btn.onclick = () => a.paused ? a.play() : a.pause();
+  a.onplay = () => { icon.innerHTML = PAUSE; btn.setAttribute('aria-label','Pause'); };
+  a.onpause = a.onended = () => { icon.innerHTML = PLAY; btn.setAttribute('aria-label','Spill av'); };
+  a.onloadedmetadata = () => document.getElementById('dur').textContent = fmt(a.duration);
+  a.ontimeupdate = () => {
+    document.getElementById('cur').textContent = fmt(a.currentTime);
+    document.getElementById('fill').style.width = (a.currentTime / a.duration * 100 || 0) + '%';
+  };
+  document.querySelector('.bar').onclick = e => {
+    const r = e.currentTarget.getBoundingClientRect();
+    if (a.duration) a.currentTime = (e.clientX - r.left) / r.width * a.duration;
+  };
+  for (let i = 0; i < 14; i++) {
+    const h = document.createElement('span'); h.className = 'heart'; h.textContent = '♡';
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.animationDuration = 9 + Math.random() * 10 + 's';
+    h.style.animationDelay = -Math.random() * 18 + 's';
+    h.style.fontSize = 10 + Math.random() * 14 + 'px';
+    document.body.appendChild(h);
+  }
+</script>
+</body>
+</html>
