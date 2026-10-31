@@ -56,8 +56,11 @@
   btn.onclick = () => a.paused ? a.play() : a.pause();
   a.onplay = () => { icon.innerHTML = PAUSE; btn.setAttribute('aria-label','Pause'); };
   a.onpause = a.onended = () => { icon.innerHTML = PLAY; btn.setAttribute('aria-label','Spill av'); };
-  a.onloadedmetadata = () => document.getElementById('dur').textContent = fmt(a.duration);
+  const showDur = () => document.getElementById('dur').textContent = fmt(a.duration);
+  a.onloadedmetadata = a.ondurationchange = showDur;
+  if (a.readyState >= 1) showDur();
   a.ontimeupdate = () => {
+    showDur();
     document.getElementById('cur').textContent = fmt(a.currentTime);
     document.getElementById('fill').style.width = (a.currentTime / a.duration * 100 || 0) + '%';
   };
